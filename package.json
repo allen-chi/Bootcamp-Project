@@ -1,0 +1,15 @@
+{
+  "name": "notetaking",
+  "version": "1.0.0",
+  "description": "note taking application",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+ "main": "index.js", "keywords": [
+    "CLI",
+    "Note",
+    "taking"
+  ],
+  "author": "Allen Chinazor",
+  "license": "ISC", "preferGlobal" : true, "bin": { "notetaking": "index.js" } 
+}
