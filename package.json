@@ -5,11 +5,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
- "main": "index.js", "keywords": [
+  "main": "index.js",
+  "keywords": [
     "CLI",
     "Note",
     "taking"
   ],
   "author": "Allen Chinazor",
-  "license": "ISC", "preferGlobal" : true, "bin": { "notetaking": "index.js" } 
+  "license": "ISC",
+  "preferGlobal": true,
+  "bin": {
+    "notetaking": "index.js"
+  },
+  "dependencies": {
+    "colors": "^1.1.2"
+  }
 }

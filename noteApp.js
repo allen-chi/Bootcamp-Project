@@ -1,58 +1,35 @@
-const readline = require ('readline');
-const rl = readline.createInterface({
+var readline = require ('readline');
+var colors = require('colors');
+var rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
+var newNote = [];
+
 
 
 rl.prompt();
-//rl.write('Note Writing Application allows you Create, View, Delete and List Notes');
+	rl.question(" NOTE TAKING APPLICATION" + '\n' +
+            " Welcome, enter .help if you're lost." + '\n' +
+            " Enter 1 to Create Note" + '\n' +
+            " Enter 2 to View Note" + '\n' +
+            " Enter 3 to Delete Note" + '\n' +
+            " Enter 4 to List Note" + '\n' +
+            " Enter 5 to Search Note" + '\n', function(num){
+            	var newNum = parseInt(num,10);
+            	if(num == 1){
+            			rl.question('Create Note :' + '\n', function(note_content){
+            				//TODO: Log answer in DB
+            				
+            				if(note_content){
+            					newNote = note_content;
+            					console.log('Note Created');
+            				}
+            				else if(!note_content){
+            					console.log("Please type in contents");
+            				}
+            			num++;
+            			})
+            		}
+    })
 
-
-//To Create Note
-rl.question('Create Note :' + '\n', function(content) {
-//TODO: Log answer in a Database
-var newNote = "";
-if (content){
-	newNote = content;
-}
-console.log('Note Created: ' + '\n' + content);
-
-
-rl.close();
-})
-
-
-
-/*
-
-var i = rl.createInterface(process.stdin, process.stdout, null);
-i.("Create Note", function(answer){
-	i.on('line', (input) => {
-	console.log('Note Created: $(input)');	
-	})
-	
-
-
-//closing the app after a reply
-	i.close();
-	process.stdin.destroy();
-})
-
-
-class NoteApp{
-
-	    var constructor = function(author){
-		this.name = author;
-		this.note =[];
-	}
-
-
-	create (note_content){
-		var newNote = new Note(id, name, note_content);
-		return this.note.push(newNote.note);
-	}
-}
-
-
-*/
