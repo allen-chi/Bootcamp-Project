@@ -9,7 +9,29 @@ var readline = require('readline')
            ].join('\n')
   ;
 
-// This should work now, thanks to @josher19
+var stmt;
+//creating Database if not existing
+var fs = require("fs");
+var file = "test.db";
+var exists = fs.existsSync(file);
+
+//Connect to Database
+
+var sqlite3 = require('sqlite3').verbose();
+var db = new sqlite3.Database(file);
+//Database Serialization
+db.serialize(function(){
+  if(!exists){
+    db.run("CREATE TABLE noteApp (id INT PRIMARY KEY, content TEXT)");
+  }
+
+stmt = db.prepare("INSERT INTO noteApp VALUES (NULL,?)");
+
+
+
+});
+
+
 function completer(line) {
   var completions = '.help .error .exit .quit .q'.split(' ')
   var hits = completions.filter(function(c) {
@@ -42,8 +64,9 @@ function prompt() {
   rl.prompt();
 }
 
-//var state = 1;
+
 var newNote;
+
 function exec(command) {
   var num = parseInt(command, 10);
   if(1 <= num && num <= 5) {
@@ -51,25 +74,41 @@ function exec(command) {
             rl.question('Create Note :' + '\n', function(note_content){
                   if(note_content){
                         newNote = note_content;
+                        stmt.run("content " + newNote);
+                        stmt.finalize();
                         console.log("Note Created".green);
                   }
                   else if (!note_content){
                         console.log("Please Enter '1' again and write a note");
                   }
+
             })
 
       }
 
+      //view Note
+
       else if (num === 2){
-            console.log(newNote);
+        rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
+          db.each("SELECT content FROM noteApp WHERE id = " + note_id, function(err, row){
+            
+            console.log("content: " + row.id + row.content);
+            
+          });
+        })            
+
       }
 
       else if (num === 3){
-            console.log("3");
+            rl.clearLine(newNote);
+            console.log("Note Deleted : " + newNote);
       }
 
       else if (num === 4){
-            console.log("4");
+            
+              
+            
+            
       }
 
       else if (num === 5){
