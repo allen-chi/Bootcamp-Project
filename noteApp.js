@@ -52,7 +52,7 @@ function welcome() {
             , "= Enter 4 to List Note"
             , "= Enter 5 to Search Note"
             , "= Enter .q to quit Application"
-            ].join('\n').white);
+            ].join('\n').blue);
   prompt();
 }
 
@@ -71,35 +71,44 @@ var newNote;
 
 function exec(command) {
   var num = parseInt(command, 10);
+  console.log(command);
   if(1 <= num && num <= 5) {
-      if (num === 1) {
+      if (num == 1) {
+        console.log("Create Note");
             rl.question("Create Note :" + '\n', function(note_content){
                   if(note_content){
                         newNote = note_content;
                         stmt.run(" " + newNote);
                         stmt.finalize();
-                        console.log("Note Created".green);
+                        console.log("Note Created! Press Enter to choose an Option".green);
                   }
                   else if (!note_content){
                         console.log("Please Enter '1' again and write a note");
                   }
 
-            });
+            })
+
 
       }
 
       //view Note
 
       else if (num === 2){
+        console.log("Enter the Note number you want to view :");
         rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
+          note_id = parseInt(note_id);
           if (note_id){
-            db.each("SELECT content FROM noteApp WHERE rowid = " + note_id, function(err, row){
+            db.each("SELECT rowid AS id, content FROM noteApp WHERE rowid = " + note_id, function(err, row){
               console.log("content: " + row.id + row.content);
             });
           }
-            else{
-              console.log ("Note does not Exist!!!".red);
-            }
+
+          else if(!note_id){
+                        console.log("Please Enter '2' again and write a note");
+                  }
+          //else {
+            //  console.log ("Note does not Exist!!!".red);
+            //}
             
           
         })            
