@@ -1,5 +1,6 @@
 var readline = require('readline')
-  , colors = require('colors') // npm install colors
+var firebase = require('firebase');
+var colors = require('colors') // npm install colors
   , rl = readline.createInterface(process.stdin, process.stdout, completer)
 
   , help = [ '.help        ' + 'display this message.'.grey
@@ -60,6 +61,7 @@ function welcome() {
             , "= Enter 4 to List Note"
             , "= Enter 5 to Search Note"
             , "= Enter 6 to Export Note to JSON"
+            , "= Enter 7 to Sync Note Online"
             , "= Enter .q to quit Application"
             ].join('\n').blue);
   prompt();
@@ -75,12 +77,11 @@ function prompt() {
 }
 
 
+
 var newNote;
-
-
 function exec(command) {
   var num = parseInt(command, 10);
-    if(1 <= num && num <= 6) {
+    if(1 <= num && num <= 7) {
       if (num === 1) {
         console.log("Create Note");
             rl.question("Create Note :" + '\n', function(note_content){
@@ -161,6 +162,29 @@ function exec(command) {
         console. log("Notes Exported" +'\n'+ "Check data folder to view your JSON file!!!" .green);
       });
     }
+
+
+    if (num === 7) {
+      //Initializing Firebase
+      var config = {
+        apiKey: "AIzaSyC8B7I3055iWo2z5OOI0zBUmWSBR7-_vYQ",
+        authDomain: "noteapp-f0b6e.firebaseapp.com",
+        databaseURL: "https://noteapp-f0b6e.firebaseio.com",
+        storageBucket: "noteapp-f0b6e.appspot.com",
+        messagingSenderId: "904823682997"
+      };
+      firebase.initializeApp(config);
+
+      //Referencing to Firebase Database Service
+
+      firebase.database().ref('NoteApp/').push(JSON.parse(fs.readFileSync('./data/noteApp.json').toString()));
+      console.log ("Note Updated".green);
+
+
+    }
+
+
+
     
 
   } else if (command[0] === '.') {
@@ -188,6 +212,11 @@ function exec(command) {
   }
   prompt();
 }
+
+
+
+
+
 
 // 
 // Set things up
