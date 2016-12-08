@@ -1,5 +1,4 @@
 var readline = require('readline')
-  , util = require('util')
   , colors = require('colors') // npm install colors
   , rl = readline.createInterface(process.stdin, process.stdout, completer)
 
@@ -9,11 +8,12 @@ var readline = require('readline')
            ].join('\n')
   ;
 
-var stmt;
+
 //creating Database if not existing
 var fs = require("fs");
 var file = "test.db";
 var exists = fs.existsSync(file);
+var stmt;
 
 //Connect to Database
 
@@ -27,9 +27,17 @@ db.serialize(function(){
 
 stmt = db.prepare("INSERT INTO noteApp VALUES (?)");
 
-
-
 });
+
+
+
+//Creating an instance to SQliteToJson
+const SqliteToJson = require('sqlite-to-json');
+const exporter = new SqliteToJson({
+  client: new sqlite3.Database('./test.db')
+});
+
+
 
 
 function completer(line) {
@@ -51,6 +59,7 @@ function welcome() {
             , "= Enter 3 to Delete Note"
             , "= Enter 4 to List Note"
             , "= Enter 5 to Search Note"
+            , "= Enter 6 to Export Note to JSON"
             , "= Enter .q to quit Application"
             ].join('\n').blue);
   prompt();
@@ -71,9 +80,8 @@ var newNote;
 
 function exec(command) {
   var num = parseInt(command, 10);
-  console.log(command);
-  if(1 <= num && num <= 5) {
-      if (num == 1) {
+    if(1 <= num && num <= 6) {
+      if (num === 1) {
         console.log("Create Note");
             rl.question("Create Note :" + '\n', function(note_content){
                   if(note_content){
@@ -116,11 +124,15 @@ function exec(command) {
       }
 
       else if (num === 3){
+        console.log('Enter the Note number you want to Delete :');
         rl.question('Enter the Note number you want to Delete :' + '\n', function(note_id){
+          note_id = parseInt(note_id);
           if (note_id){
             db.each("DELETE FROM noteApp WHERE rowid = " + note_id, function(err, row){
               console.log("NOTE DELETED ----" );
             });
+
+            console.log("NOTE DELETED ----" );
           }
             else if(!note_id){
               console.log ("Note does not Exist!!!".red);
@@ -140,21 +152,22 @@ function exec(command) {
       }
 
       else if (num === 5){
-            console.log("5");
+            console.log("Search function to included soon");
       }     
 
  
-    /*if (num === 6) {
-      console.log('WOW YOU ROCKS A LOT!'.rainbow);
-      process.exit(0);
+    if (num === 6) {
+      exporter.save('noteApp', './data/noteApp.json', function(err){
+        console. log("Notes Exported" +'\n'+ "Check data folder to view your JSON file!!!" .green);
+      });
     }
-    */
+    
 
   } else if (command[0] === '.') {
   
     switch (command.slice(1)) {
       case 'help':
-        util.puts(help.yellow);
+        console.log(help.yellow);
         break;
       case 'error':
         console.log("Here's what an error might look like");
@@ -183,12 +196,12 @@ rl.on('line', function(cmd) {
   exec(cmd.trim());
 }).on('close', function() {
   // only gets triggered by ^C or ^D
-  util.puts('goodbye!'.green);
+  console.log('goodbye!'.green);
   process.exit(0);
 });
 
 process.on('uncaughtException', function(e) {
-  util.puts(e.stack.red);
+  console.log(e.stack.red);
   rl.prompt();
 });
 
