@@ -15,6 +15,7 @@ var fs = require("fs");
 var file = "test.db";
 var exists = fs.existsSync(file);
 var stmt;
+var limit;
 
 //Connect to Database
 var sqlite3 = require('sqlite3').verbose();
@@ -26,6 +27,7 @@ db.serialize(function(){
   }
 
 stmt = db.prepare("INSERT INTO noteApp VALUES (?)");
+limit = db.run("SELECT * FROM noteApp LIMIT 5 OFFSET 5");
 
 });
 
@@ -40,7 +42,6 @@ function completer(line) {
   var completions = '.help .error .exit .quit .q'.split(' ')
   var hits = completions.filter(function(c) {
     if (c.indexOf(line) == 0) {
-      // console.log('bang! ' + c);
       return c;
     }
   });
@@ -114,13 +115,7 @@ function exec(command) {
           else if(!note_id){
                         console.log("Please Enter '2' again and write a note");
                   }
-          //else {
-            //  console.log ("Note does not Exist!!!".red);
-            //}
-            
-          
-        })            
-
+        }) 
       }
 
       else if (num === 3){
@@ -143,28 +138,39 @@ function exec(command) {
       }
 
       else if (num === 4){
-            db.each("SELECT rowid AS id, content FROM noteApp", function(err, row){
-              console.log(row.id +" : "+row.content);
+            
+            var page = 1;
+            var perPage = 5;
+
+            function showRow(page) {
+              console.log(page, " --> Page");
+              var offset = (page - 1) * perPage;
+              db.each("SELECT rowid AS id, content FROM noteApp LIMIT " + perPage + " OFFSET " + offset, function(err, row) {
+                console.log(row.id + " : " + row.content);
+              });
+            }
+
+            showRow(page);
+
+            console.log("NEXT? (Y/N): ");
+            rl.question("NEXT? (Y/N): ", function(ans) {
+              if(ans === "Y" ||"y"){
+                showRow(page+=1);
+              } else {
+                console.log("Thanks");
+              }
             });
       }
 
       else if (num === 5){
-        console.log('Type in the word to search'.yellow);
-        rl.question('Type in the word to search:' + '\n', function(query_string){
+        //console.log('Type in the word to search'.yellow);
+        rl.question('Type in the word to search:'.yellow + '\n', function(query_string){
           if (query_string){
             db.each("SELECT content FROM noteApp WHERE content LIKE '%" + query_string +"%'", function(err, row){
               console.log("Content : " + row.content);
             });
-
-            console.log("NOTE DELETED ----" );
           }
-                        
-          
-        })        
-
-
-
-            console.log("Search function to included soon");
+        })
       }     
 
  
