@@ -51,9 +51,9 @@ function welcome() {
   console.log([ "= NOTE TAKING APPLICATION"
             , "= Welcome, enter .help if you're lost."
             , "= Enter 1 to Create Note"
-            , "= Enter 2 to List Note"
+            , "= Enter 2 to View Note"
             , "= Enter 3 to Delete Note"
-            , "= Enter 4 to View Note"
+            , "= Enter 4 to List Note"
             , "= Enter 5 to Search Note"
             , "= Enter 6 to Export Note to JSON"
             , "= Enter 7 to Sync Note Online"
@@ -88,7 +88,6 @@ function exec(command) {
                   if(note_content){
                         var newNote = note_content;
                         stmt.run(" " + newNote);
-                        stmt.finalize();
                         console.log("Note Created!".green);
                   }
                   else if (!note_content){
@@ -103,9 +102,24 @@ function exec(command) {
       //view Note
 
       else if (num === 2){
-        db.each("SELECT rowid AS id, content FROM noteApp", function(err, row){
-              console.log(row.id +" : "+row.content);
-            });            
+        console.log("Enter the Note number you want to view :");
+        rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
+          note_id = parseInt(note_id);
+          if (note_id){
+            db.each("SELECT rowid AS id, content FROM noteApp WHERE rowid = " + note_id, function(err, row){
+              console.log("content: " + row.id + row.content);
+            });
+          }
+
+          else if(!note_id){
+                        console.log("Please Enter '2' again and write a note");
+                  }
+          //else {
+            //  console.log ("Note does not Exist!!!".red);
+            //}
+            
+          
+        })            
 
       }
 
@@ -129,23 +143,27 @@ function exec(command) {
       }
 
       else if (num === 4){
-        console.log("Enter the Note number you want to view :");
-        rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
-          note_id = parseInt(note_id);
-          if (note_id){
-            db.each("SELECT rowid AS id, content FROM noteApp WHERE rowid = " + note_id, function(err, row){
-              console.log("content: " + row.id + row.content);
+            db.each("SELECT rowid AS id, content FROM noteApp", function(err, row){
+              console.log(row.id +" : "+row.content);
             });
-          }
-
-          else if(!note_id){
-                        console.log("Please Enter '2' again and write a note");
-                  }
-        })            
-
       }
 
       else if (num === 5){
+        console.log('Type in the word to search'.yellow);
+        rl.question('Type in the word to search:' + '\n', function(query_string){
+          if (query_string){
+            db.each("SELECT content FROM noteApp WHERE content LIKE '%" + query_string +"%'", function(err, row){
+              console.log("Content : " + row.content);
+            });
+
+            console.log("NOTE DELETED ----" );
+          }
+                        
+          
+        })        
+
+
+
             console.log("Search function to included soon");
       }     
 
