@@ -52,9 +52,9 @@ function welcome() {
   console.log([ "= NOTE TAKING APPLICATION"
             , "= Welcome, enter .help if you're lost."
             , "= Enter 1 to Create Note"
-            , "= Enter 2 to View Note"
+            , "= Enter 2 to List Note"
             , "= Enter 3 to Delete Note"
-            , "= Enter 4 to List Note"
+            , "= Enter 4 to View Note"
             , "= Enter 5 to Search Note"
             , "= Enter 6 to Export Note to JSON"
             , "= Enter 7 to Sync Note Online"
@@ -100,44 +100,9 @@ function exec(command) {
 
       }
 
-      //view Note
+      //List All Note
 
       else if (num === 2){
-        console.log("Enter the Note number you want to view :");
-        rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
-          note_id = parseInt(note_id);
-          if (note_id){
-            db.each("SELECT rowid AS id, content FROM noteApp WHERE rowid = " + note_id, function(err, row){
-              console.log("content: " + row.id + row.content);
-            });
-          }
-
-          else if(!note_id){
-                        console.log("Please Enter '2' again and write a note");
-                  }
-        }) 
-      }
-
-      else if (num === 3){
-        console.log('Enter the Note number you want to Delete :');
-        rl.question('Enter the Note number you want to Delete :' + '\n', function(note_id){
-          note_id = parseInt(note_id);
-          if (note_id){
-            db.each("DELETE FROM noteApp WHERE rowid = " + note_id, function(err, row){
-              console.log("NOTE DELETED ----" );
-            });
-
-            console.log("NOTE DELETED ----" );
-          }
-            else if(!note_id){
-              console.log ("Note does not Exist!!!".red);
-            }
-            
-          
-        })        
-      }
-
-      else if (num === 4){
             
             var page = 1;
             var perPage = 5;
@@ -162,8 +127,49 @@ function exec(command) {
             });
       }
 
+      else if (num === 3){
+        console.log('Enter the Note number you want to Delete :');
+        rl.question('Enter the Note number you want to Delete :' + '\n', function(note_id){
+          note_id = parseInt(note_id);
+          if (note_id){
+            db.each("DELETE FROM noteApp WHERE rowid = " + note_id, function(err, row){
+              console.log("NOTE DELETED ----" );
+            });
+
+            console.log("NOTE DELETED ----" );
+          }
+            else if(!note_id){
+              console.log ("Note does not Exist!!!".red);
+            }
+            
+          
+        })        
+      }
+
+
+      //View Notes based on inputs and if available in DB
+      else if (num === 4){
+        console.log("Enter the Note number you want to view :");
+        rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
+          note_id = parseInt(note_id);
+          if (note_id){
+            db.each("SELECT rowid AS id, content FROM noteApp WHERE rowid = " + note_id, function(err, row){
+              console.log("content: " + row.id + row.content);
+            });
+          }
+
+          else if(!note_id){
+                        console.log("Please Enter '2' again and write a note");
+                  }
+        }) 
+      }
+
+
+
+
+
       else if (num === 5){
-        //console.log('Type in the word to search'.yellow);
+        console.log('Type in the word to search'.yellow);
         rl.question('Type in the word to search:'.yellow + '\n', function(query_string){
           if (query_string){
             db.each("SELECT content FROM noteApp WHERE content LIKE '%" + query_string +"%'", function(err, row){
