@@ -15,7 +15,7 @@ var fs = require("fs");
 var file = "test.db";
 var exists = fs.existsSync(file);
 var stmt;
-var limit;
+
 
 //Connect to Database
 var sqlite3 = require('sqlite3').verbose();
@@ -27,7 +27,7 @@ db.serialize(function(){
   }
 
 stmt = db.prepare("INSERT INTO noteApp VALUES (?)");
-limit = db.run("SELECT * FROM noteApp LIMIT 5 OFFSET 5");
+
 
 });
 
@@ -117,7 +117,7 @@ function exec(command) {
 
             showRow(page);
 
-            console.log("NEXT? (Y/N): ");
+            console.log("NEXT? (Y/N): "+ '/n');
             rl.question("NEXT? (Y/N): ", function(ans) {
               if(ans === "Y" ||"y"){
                 showRow(page+=1);
