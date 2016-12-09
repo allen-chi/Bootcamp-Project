@@ -17,7 +17,6 @@ var exists = fs.existsSync(file);
 var stmt;
 
 //Connect to Database
-
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(file);
 //Database Serialization
@@ -30,15 +29,11 @@ stmt = db.prepare("INSERT INTO noteApp VALUES (?)");
 
 });
 
-
-
 //Creating an instance to SQliteToJson
 const SqliteToJson = require('sqlite-to-json');
 const exporter = new SqliteToJson({
   client: new sqlite3.Database('./test.db')
 });
-
-
 
 
 function completer(line) {
@@ -56,9 +51,9 @@ function welcome() {
   console.log([ "= NOTE TAKING APPLICATION"
             , "= Welcome, enter .help if you're lost."
             , "= Enter 1 to Create Note"
-            , "= Enter 2 to View Note"
+            , "= Enter 2 to List Note"
             , "= Enter 3 to Delete Note"
-            , "= Enter 4 to List Note"
+            , "= Enter 4 to View Note"
             , "= Enter 5 to Search Note"
             , "= Enter 6 to Export Note to JSON"
             , "= Enter 7 to Sync Note Online"
@@ -76,9 +71,14 @@ function prompt() {
   rl.prompt();
 }
 
+function toJson(){
 
+  exporter.save('noteApp', './data/noteApp.json', function(err){
+        //Print out update
+      });
+}
+ 
 
-var newNote;
 function exec(command) {
   var num = parseInt(command, 10);
     if(1 <= num && num <= 7) {
@@ -86,10 +86,10 @@ function exec(command) {
         console.log("Create Note");
             rl.question("Create Note :" + '\n', function(note_content){
                   if(note_content){
-                        newNote = note_content;
+                        var newNote = note_content;
                         stmt.run(" " + newNote);
                         stmt.finalize();
-                        console.log("Note Created! Press Enter to choose an Option".green);
+                        console.log("Note Created!".green);
                   }
                   else if (!note_content){
                         console.log("Please Enter '1' again and write a note");
@@ -103,24 +103,9 @@ function exec(command) {
       //view Note
 
       else if (num === 2){
-        console.log("Enter the Note number you want to view :");
-        rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
-          note_id = parseInt(note_id);
-          if (note_id){
-            db.each("SELECT rowid AS id, content FROM noteApp WHERE rowid = " + note_id, function(err, row){
-              console.log("content: " + row.id + row.content);
-            });
-          }
-
-          else if(!note_id){
-                        console.log("Please Enter '2' again and write a note");
-                  }
-          //else {
-            //  console.log ("Note does not Exist!!!".red);
-            //}
-            
-          
-        })            
+        db.each("SELECT rowid AS id, content FROM noteApp", function(err, row){
+              console.log(row.id +" : "+row.content);
+            });            
 
       }
 
@@ -144,12 +129,20 @@ function exec(command) {
       }
 
       else if (num === 4){
-            db.each("SELECT rowid AS id, content FROM noteApp", function(err, row){
-              console.log(row.id +" : "+row.content);
+        console.log("Enter the Note number you want to view :");
+        rl.question('Enter the Note number you want to view :' + '\n', function(note_id){
+          note_id = parseInt(note_id);
+          if (note_id){
+            db.each("SELECT rowid AS id, content FROM noteApp WHERE rowid = " + note_id, function(err, row){
+              console.log("content: " + row.id + row.content);
             });
-              
-            
-            
+          }
+
+          else if(!note_id){
+                        console.log("Please Enter '2' again and write a note");
+                  }
+        })            
+
       }
 
       else if (num === 5){
@@ -158,9 +151,8 @@ function exec(command) {
 
  
     if (num === 6) {
-      exporter.save('noteApp', './data/noteApp.json', function(err){
-        console. log("Notes Exported" +'\n'+ "Check data folder to view your JSON file!!!" .green);
-      });
+      toJson();
+      console.log("Notes Exported" +'\n'+ "Check data folder to view your JSON file!!!" .green);
     }
 
 
@@ -177,15 +169,11 @@ function exec(command) {
 
       //Referencing to Firebase Database Service
 
+      toJson();
       firebase.database().ref('NoteApp/').push(JSON.parse(fs.readFileSync('./data/noteApp.json').toString()));
       console.log ("Note Updated".green);
-
-
     }
 
-
-
-    
 
   } else if (command[0] === '.') {
   
@@ -212,10 +200,6 @@ function exec(command) {
   }
   prompt();
 }
-
-
-
-
 
 
 // 
